@@ -4,13 +4,16 @@
   "description": "Nodejs and Expressjs Web Api Course",
   "main": "app.js",
   "scripts": {
-    "test": "nodemon app.js"
+    "test": "nodemon app.js",
+    "generate-swagger": "node generate-swagger.js"
   },
   "author": "Karim Ali",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }
