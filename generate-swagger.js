@@ -1,25 +1,12 @@
 // generate-swagger.js
 const fs = require('fs');
-const swaggerJsdoc = require('swagger-jsdoc');
+const path = require('path');
 
-const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Books API',
-      version: '1.0.0',
-      description: 'A simple CRUD API for managing books',
-    },
-    servers: [
-      {
-        url: 'http://localhost:3000',
-      },
-    ],
-  },
-  apis: ['./app.js'], // Add more files as needed
-};
+// Import your manually defined OpenAPI document from joi-to-swagger
+const openApiDocument = require('./swagger/openapi');
 
-const swaggerSpec = swaggerJsdoc(options);
+const outputPath = path.join(__dirname, 'swagger.json');
 
-fs.writeFileSync('./swagger.json', JSON.stringify(swaggerSpec, null, 2));
+fs.writeFileSync(outputPath, JSON.stringify(openApiDocument, null, 2));
+
 console.log('✅ Swagger JSON generated at ./swagger.json');

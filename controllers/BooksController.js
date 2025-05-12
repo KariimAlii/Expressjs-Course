@@ -1,3 +1,5 @@
+const bookSchema = require('../schemas/book.schema.js')
+console.log(bookSchema)
 //! Static books data
 const books = [
   { id: 1, title: 'The Catcher in the Rye', author: 'J.D. Salinger' },
@@ -11,6 +13,13 @@ exports.getBooks = (req, res) => {
 
 //! Controller to handle POST request to add a book
 exports.addBook = (req, res) => {
+    debugger
+  const { error, value } = bookSchema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    // If there are validation errors, return them in the response
+    return res.status(400).json({ errors: error.details });
+  }
   const { title, author } = req.body;
   const newBook = { id: books.length + 1, title, author };
   books.push(newBook);
@@ -18,6 +27,9 @@ exports.addBook = (req, res) => {
 };
 
 exports.updateBook = (req, res) => {
+    const { error, value } = bookSchema.validate(req.body, { abortEarly: false });
+   if (error) 
+    return res.status(400).json({ errors: error.details });
     const { id, title, author } = req.body;
     const book = books.find(b => b.id == id);
     book.title = title;
@@ -36,7 +48,7 @@ exports.updateBook = (req, res) => {
     return res.status(404).json({ message: "Book not found" });
 
   book.title = title || book.title;
-  
+
   book.author = author || book.author;
 
   res.json(book);
