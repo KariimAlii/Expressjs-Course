@@ -1,0 +1,15 @@
+{
+  "name": "expressjs-course",
+  "version": "1.0.0",
+  "description": "Nodejs and Expressjs Web Api Course",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "author": "Karim Ali",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
