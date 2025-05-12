@@ -1,8 +1,15 @@
-//! Import Express module
+//! Import Dependencies
 const express = require('express');
+const morgan = require("morgan");
+
+//! Import Controllers
+const booksController = require('./controllers/BooksController');
 
 //! Initialize an Express app
 const app = express();
+
+//! Logging Middleware
+app.use(morgan(":method :url :response-time"));
 
 //! Parse Request Body
 app.use(express.json());
@@ -18,24 +25,13 @@ app.get('/', (req, res) => {
   res.send('Welcome to Express API!');
 });
 
-//! Example data (static)
-const books = [
-  { id: 1, title: 'The Catcher in the Rye', author: 'J.D. Salinger' },
-  { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee' },
-];
+app.get('/api/books', booksController.getBooks);
 
-//! GET route to fetch all books
-app.get('/api/books', (req, res) => {
-  res.json(books);
-});
+app.post('/api/books', booksController.addBook);
 
-//! POST route to add a new book
-app.post('/api/books', express.json(), (req, res) => {
-  const { title, author } = req.body;
-  const newBook = { id: books.length + 1, title, author };
-  books.push(newBook);
-  res.status(201).json(newBook); // Return the newly created book
-});
+app.put('/api/books/:id', booksController.updateBook); 
+
+app.delete('/api/books/:id', booksController.deleteBook); 
 
 
 //! Start the server
