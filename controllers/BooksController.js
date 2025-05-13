@@ -1,71 +1,63 @@
 const bookSchema = require('../schemas/book.schema.js')
-console.log(bookSchema)
-//! Static books data
-const books = [
-  { id: 1, title: 'The Catcher in the Rye', author: 'J.D. Salinger' },
-  { id: 2, title: 'To Kill a Mockingbird', author: 'Harper Lee' },
-];
+const Book = require('../models/book');
 
 //! Controller to handle GET request for books
-exports.getBooks = (req, res) => {
-  res.json(books);
+exports.getBooks = async (req, res) => {
+    try {
+        const books = await Book.find();
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching books' });
+    }
 };
 
 //! Controller to handle POST request to add a book
-exports.addBook = (req, res) => {
-    debugger
-  const { error, value } = bookSchema.validate(req.body, { abortEarly: false });
-
-  if (error) {
-    // If there are validation errors, return them in the response
-    return res.status(400).json({ errors: error.details });
-  }
-  const { title, author } = req.body;
-  const newBook = { id: books.length + 1, title, author };
-  books.push(newBook);
-  res.status(201).json(newBook);
+exports.addBook = async (req, res) => {
+    try {
+        const { title, author, publishedYear } = req.body;
+        const newBook = new Book({ title, author, publishedYear });
+        await newBook.save();
+        res.status(201).json(newBook);
+    } catch (error) {
+        res.status(500).json({ error: 'Error creating book' });
+    }
 };
 
-exports.updateBook = (req, res) => {
-    const { error, value } = bookSchema.validate(req.body, { abortEarly: false });
-   if (error) 
-    return res.status(400).json({ errors: error.details });
-    const { id, title, author } = req.body;
-    const book = books.find(b => b.id == id);
-    book.title = title;
-    book.author = author;
-    res.status(200);
-}
+// exports.updateBook = (req, res) => {
+//     const { error, value } = bookSchema.validate(req.body, { abortEarly: false });
+//    if (error)
+//     return res.status(400).json({ errors: error.details });
+//     const { id, title, author } = req.body;
+//     const book = books.find(b => b.id == id);
+//     book.title = title;
+//     book.author = author;
+//     res.status(200);
+// }
 
 // PUT /books/:id
-exports.updateBook = (req, res) => {
-  const { id } = req.params;      // Path variable
-  const { title, author } = req.body;
-
-  const book = books.find(b => b.id === parseInt(id));
-
-  if (!book) 
-    return res.status(404).json({ message: "Book not found" });
-
-  book.title = title || book.title;
-
-  book.author = author || book.author;
-
-  res.json(book);
+exports.updateBook = async (req, res) => {
+    try {
+        const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedBook) {
+            return res.status(404).json({ error: 'Book not found' });
+        }
+        res.status(200).json(updatedBook);
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating book' });
+    }
 };
 
 // DELETE /books/:id
-exports.deleteBook = (req, res) => {
-  const { id } = req.params;
-
-  const index = books.findIndex(b => b.id === parseInt(id));
-
-  if (index === -1) 
-    return res.status(404).json({ message: "Book not found" });
-
-  const deletedBook = books.splice(index, 1);
-
-  res.json(deletedBook[0]);
+exports.deleteBook = async (req, res) => {
+    try {
+        const deletedBook = await Book.findByIdAndDelete(req.params.id);
+        if (!deletedBook) {
+            return res.status(404).json({ error: 'Book not found' });
+        }
+        res.status(200).json({ message: 'Book deleted' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting book' });
+    }
 };
 
 //! How to read data from the rqeuest

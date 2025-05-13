@@ -3,6 +3,8 @@ const express = require('express');
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 
+const seedBooks = require("./seedings/seedBooks");
+
 const swaggerJsdoc = require('swagger-jsdoc');
 const openApiDocument = require('./swagger/openapi');
 const swaggerUi = require('swagger-ui-express');
@@ -53,8 +55,9 @@ app.delete('/api/books/:id', booksController.deleteBook);
 //! Start the server
 mongoose
     .connect("mongodb://127.0.0.1:27017/EcommerceSystem")
-    .then(() => {
+    .then(async () => {
       console.log("DB Connected ..");
+      await seedBooks();
       app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
         console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
