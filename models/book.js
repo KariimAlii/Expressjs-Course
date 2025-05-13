@@ -5,15 +5,17 @@ const mongoose = require('mongoose');
 const bookSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true,
+        required: [true, 'Title is required'],
     },
     author: {
         type: String,
-        required: true,
+        required: [true, 'Author is required'],
     },
     publishedYear: {
         type: Number,
-        required: true,
+        required: [true, 'Published year is required'],
+        min: [1900, 'Year must be greater than or equal to 1900'],
+        max: [new Date().getFullYear(), `Year cannot be greater than ${new Date().getFullYear()}`],
     },
 });
 
