@@ -1,9 +1,12 @@
 //! Import Dependencies
 const express = require('express');
 const morgan = require("morgan");
+const mongoose = require("mongoose");
+
 const swaggerJsdoc = require('swagger-jsdoc');
 const openApiDocument = require('./swagger/openapi');
 const swaggerUi = require('swagger-ui-express');
+
 const path = require('path');
 
 //! Import Controllers
@@ -48,7 +51,15 @@ app.delete('/api/books/:id', booksController.deleteBook);
 
 
 //! Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
-});
+mongoose
+    .connect("mongodb://127.0.0.1:27017/EcommerceSystem")
+    .then(() => {
+      console.log("DB Connected ..");
+      app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+        console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+      });
+    })
+    .catch((error) => console.log(`DB ERROR: ${error}`));
+
+
