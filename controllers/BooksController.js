@@ -14,12 +14,17 @@ exports.getBooks = async (req, res) => {
 //! Controller to handle POST request to add a book
 exports.addBook = async (req, res) => {
     try {
-        const { title, author, publishedYear } = req.body;
-        const newBook = new Book({ title, author, publishedYear });
+        const { title, author, publishedYear, isbn } = req.body;
+        const newBook = new Book({ title, author, publishedYear, isbn });
         await newBook.save();
         res.status(201).json(newBook);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating book' });
+        if (error.name === 'ValidationError') {
+            const errorMessages = Object.values(error.errors).map(e => e.message);
+            res.status(400).json({ errors: errorMessages });
+        } else {
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
     }
 };
 

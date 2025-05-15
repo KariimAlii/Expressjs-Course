@@ -16,10 +16,25 @@ const bookSchema = new mongoose.Schema({
         min: [1900, 'Year must be greater than or equal to 1900'],
         max: [new Date().getFullYear(), `Year cannot be greater than ${new Date().getFullYear()}`],
     },
+    isbn: {
+        type: String,
+        required: [true, 'Isbn is required'],
+        validate: {
+            validator: function (v) {
+                return /\d{3}-\d{10}/.test(v); // The isbn field uses a regular expression to validate if the input is in a valid ISBN format (e.g., 978-1234567890).
+            },
+            message: props => `${props.value} is not a valid ISBN!`,
+        },
+    }
 });
 
+if (mongoose.models.Book) {
+    delete mongoose.models.Book;
+}
+
 // Create a model based on the schema
-const Book = mongoose.models.Book || mongoose.model('Book', bookSchema);
+// const Book = mongoose.models.Book || mongoose.model('Book', bookSchema);
+const Book = mongoose.model('Book', bookSchema);
 
 module.exports = Book;
 
