@@ -2,17 +2,17 @@ const bookSchema = require('../schemas/book.schema.js')
 const Book = require('../models/book');
 
 //! Controller to handle GET request for books
-exports.getBooks = async (req, res) => {
+exports.getBooks = async (req, res, next) => {
     try {
         const books = await Book.find();
         res.status(200).json(books);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching books' });
+        next(error);
     }
 };
 
 //! Controller to handle POST request to add a book
-exports.addBook = async (req, res) => {
+exports.addBook = async (req, res, next) => {
     try {
         const { title, author, publishedYear, isbn } = req.body;
         const newBook = new Book({ title, author, publishedYear, isbn });
@@ -23,7 +23,7 @@ exports.addBook = async (req, res) => {
             const errorMessages = Object.values(error.errors).map(e => e.message);
             res.status(400).json({ errors: errorMessages });
         } else {
-            res.status(500).json({ error: 'Internal Server Error' });
+            next(error);
         }
     }
 };
@@ -40,7 +40,7 @@ exports.addBook = async (req, res) => {
 // }
 
 // PUT /books/:id
-exports.updateBook = async (req, res) => {
+exports.updateBook = async (req, res, next) => {
     try {
         const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedBook) {
@@ -48,12 +48,12 @@ exports.updateBook = async (req, res) => {
         }
         res.status(200).json(updatedBook);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating book' });
+        next(error);
     }
 };
 
 // DELETE /books/:id
-exports.deleteBook = async (req, res) => {
+exports.deleteBook = async (req, res, next) => {
     try {
         const deletedBook = await Book.findByIdAndDelete(req.params.id);
         if (!deletedBook) {
@@ -61,7 +61,7 @@ exports.deleteBook = async (req, res) => {
         }
         res.status(200).json({ message: 'Book deleted' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting book' });
+        next(error);
     }
 };
 

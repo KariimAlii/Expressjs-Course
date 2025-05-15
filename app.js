@@ -49,8 +49,18 @@ app.post('/api/books', booksController.addBook);
 app.put('/api/books/:id', booksController.updateBook); 
 
 
-app.delete('/api/books/:id', booksController.deleteBook); 
+app.delete('/api/books/:id', booksController.deleteBook);
 
+//! Not Found Middleware
+app.use((request, response, next) => {
+    response.status(404).json({ message: "Not Found" });
+});
+
+//! Error Middleware
+app.use((error, request, response, next) => {
+    // console.log(error)
+    response.status(500).json({ message: `Exception Occured: ${error}` });
+});
 
 //! Start the server
 mongoose
