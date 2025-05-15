@@ -27,7 +27,8 @@ const studentSchema = new mongoose.Schema(
             }
         },
         address: {
-            _id: {id:false}, //! to disable auto-generation of ObjectID [Embedded Document]
+            // _id: {id:false}, //! to disable auto-generation of ObjectID [Embedded Document]
+            _id: false, //! to disable auto-generation of ObjectID [Embedded Document]
             street: { type: String, required: true },
             building: { type: Number, required: true },
         },
@@ -38,3 +39,15 @@ const studentSchema = new mongoose.Schema(
 //* 2- Mapping (Setter)
 
 module.exports = mongoose.model("Student", studentSchema);
+
+
+// const addressSchema = new mongoose.Schema({
+//     city: String,
+//     street: String
+// }, { _id: false });
+//
+// const studentSchema = new mongoose.Schema({
+//     name: String,
+//     age: Number,
+//     address: addressSchema
+// });
