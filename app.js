@@ -14,6 +14,12 @@ const path = require('path');
 //! Import Controllers
 const booksController = require('./controllers/BooksController');
 
+//! Import Routers
+const classRouter = require('./routers/classRouter')
+const studentRouter = require('./routers/studentRouter')
+const teacherRouter = require('./routers/teacherRouter')
+const bookRouter = require('./routers/bookRouter')
+
 //! Initialize an Express app
 const app = express();
 
@@ -50,6 +56,16 @@ app.put('/api/books/:id', booksController.updateBook);
 
 
 app.delete('/api/books/:id', booksController.deleteBook);
+
+//! Routers
+
+app.use(bookRouter);
+
+app.use(teacherRouter);
+
+app.use(studentRouter);
+
+app.use(classRouter);
 
 //! Not Found Middleware
 app.use((req, res, next) => {
