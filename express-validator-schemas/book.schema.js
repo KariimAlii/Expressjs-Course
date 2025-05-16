@@ -8,7 +8,7 @@ const createBookValidation = [
     body('publishedYear')
         .isInt({ min: 1900, max: new Date().getFullYear() })
         .withMessage('Published year must be a valid year between 1900 and the current year'),
-    body('isbn').isString().matches(new RegExp('/\\d{3}-\\d{10}/')),
+    body('isbn').isString().matches(new RegExp('/\\d{3}-\\d{10}/')).withMessage("ISBN must be in the format XXX-XXXXXXXXXX"), // you can use .matches(/^\d{3}-\d{10}$/)
 ];
 
 // Middleware to handle validation results
@@ -20,4 +20,10 @@ const validate = (req, res, next) => {
     next();
 };
 
-module.exports = { createBookValidation, validate };
+const validateCreateBook = [...createBookValidation, validate];
+
+module.exports = {
+    createBookValidation,
+    validate,
+    validateCreateBook
+};
