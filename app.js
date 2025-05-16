@@ -13,14 +13,14 @@ const path = require('path');
 
 //! Import Controllers
 const booksController = require('./controllers/BooksController');
-const { validateCreateBook } = require('./schemas/book.schema');
-const { createBookValidation, validate } = require('./express-validator-schemas/book.schema');
+
 
 //! Import Routers
 const classRouter = require('./routers/classRouter')
 const studentRouter = require('./routers/studentRouter')
 const teacherRouter = require('./routers/teacherRouter')
 const bookRouter = require('./routers/bookRouter')
+const authRouter = require('./routers/authRouter')
 
 //! Initialize an Express app
 const app = express();
@@ -48,17 +48,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/api/books', booksController.getBooks);
 
-
-// app.post('/api/books', validateCreateBook , booksController.addBook);
-app.post('/api/books', createBookValidation , validate , booksController.addBook);
-
-
-app.put('/api/books/:id', booksController.updateBook); 
-
-
-app.delete('/api/books/:id', booksController.deleteBook);
 
 //! Routers
 
@@ -70,6 +60,8 @@ app.use(studentRouter);
 
 app.use(classRouter);
 
+app.use('/api/auth', authRouter);
+
 //! Not Found Middleware
 app.use((req, res, next) => {
     res.status(404).json({ message: "Not Found" });
@@ -77,6 +69,16 @@ app.use((req, res, next) => {
 
 //! Error Middleware
 app.use((error, req, res, next) => {
+    // Mongoose validation error
+    if (error.name === 'ValidationError') {
+        const errorMessages = Object.values(error.errors).map(e => e.message);
+        return res.status(400).json({ errorMessages });
+    }
+
+    // Joi validation error
+    if (error.isJoi) {
+        return res.status(400).json({ errors: err.details });
+    }
     res.status(500).json({
         message: 'Something went wrong',
         details: error.message,
