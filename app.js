@@ -13,6 +13,7 @@ const path = require('path');
 
 //! Import Controllers
 const booksController = require('./controllers/BooksController');
+const { validateCreateBook } = require('./schemas/book.schema');
 
 //! Import Routers
 const classRouter = require('./routers/classRouter')
@@ -49,7 +50,7 @@ app.get('/', (req, res) => {
 app.get('/api/books', booksController.getBooks);
 
 
-app.post('/api/books', booksController.addBook);
+app.post('/api/books', validateCreateBook , booksController.addBook);
 
 
 app.put('/api/books/:id', booksController.updateBook); 

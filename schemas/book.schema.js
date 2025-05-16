@@ -8,4 +8,20 @@ const bookSchema = Joi.object({
   isbn: Joi.string().regex(/\d{3}-\d{10}/).description('The isbn is not valid!!!!'),
 });
 
-module.exports = { bookSchema };
+const validate = (schema) => (req, res, next) => {
+  const { error } = schema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({
+      errors: error.details.map((detail) => ({
+        msg: detail.message,
+        field: detail.context.key,
+      })),
+    });
+  }
+  next();
+};
+
+module.exports = {
+  validateCreateBook: validate(bookSchema),
+  bookSchema
+};

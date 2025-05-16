@@ -14,10 +14,6 @@ exports.getBooks = async (req, res, next) => {
 //! Controller to handle POST request to add a book
 exports.addBook = async (req, res, next) => {
     try {
-        const { error, value } = bookSchema.validate(req.body, { abortEarly: false });
-        if (error)
-            return res.status(400).json({ errors: error.details });
-
         const { title, author, publishedYear, isbn } = req.body;
         const newBook = new Book({ title, author, publishedYear, isbn });
         await newBook.save();
