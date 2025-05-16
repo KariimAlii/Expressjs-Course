@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../controllers/TeachersController");
 
 router
-    .route("/teachers")
+    .route("/api/teachers")
     .get(
         controller.getAllTeachers
     )

@@ -3,7 +3,7 @@ const router = express.Router();
 const controller = require("../controllers/ClassController");
 
 router
-    .route("/classes")
+    .route("/api/classes")
     .get(
         controller.getAllClasses
     )
