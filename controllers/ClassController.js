@@ -61,9 +61,21 @@ module.exports.addClass = async (request, response,next) => {
     }
 
 };
-module.exports.updateClass = (request, response) => {
-    response.status(201).json({ message: "Update ~ Class" });
+module.exports.updateClass = async (req, res, next) => {
+    try {
+        const updated = await Class.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updated) return res.status(404).json({ message: "Class not found" });
+        res.status(201).json(updated);
+    } catch (err) {
+        next(err);
+    }
 };
-module.exports.deleteClass = (request, response) => {
-    response.status(201).json({ message: "Delete ~ Class" });
+module.exports.deleteClass = async (req, res, next) => {
+    try {
+        const deleted = await Class.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ message: "Class not found" });
+        res.status(204).json({ message: "Class deleted" });
+    } catch (err) {
+        next(err);
+    }
 };

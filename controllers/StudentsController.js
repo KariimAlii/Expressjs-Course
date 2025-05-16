@@ -27,9 +27,22 @@ module.exports.addStudent = async (request, response,next) => {
         next(error);
     }
 };
-module.exports.updateStudent = (request, response) => {
-    response.status(201).json({ message: "Update ~ Student" });
+
+module.exports.updateStudent = async (req, res, next) => {
+    try {
+        const updated = await Student.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updated) return res.status(404).json({ message: "Student not found" });
+        res.status(201).json(updated);
+    } catch (err) {
+        next(err);
+    }
 };
-module.exports.deleteStudent = (request, response) => {
-    response.status(201).json({ message: "Delete ~ Student" });
+module.exports.deleteStudent = async (req, res, next) => {
+    try {
+        const deleted = await Student.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ message: "Student not found" });
+        res.json({ message: "Student deleted" });
+    } catch (err) {
+        next(err);
+    }
 };
