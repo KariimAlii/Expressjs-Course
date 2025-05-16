@@ -16,45 +16,38 @@ module.exports.getAllClasses = async (request, response,next) => {
         next (error)
     }
 };
-module.exports.addClass = async (request, response,next) => {
+module.exports.addClass = async (req, res,next) => {
     try {
-        const { name, supervisorFullName, studentIds} = request.body;
+        const {name, supervisorFullName, studentNames } = req.body;
 
         const supervisor = await Teacher.findOne({fullName: supervisorFullName});
 
-        // ❌❌ Fetching data in sequence (N+1) issue
-        // let students = [];
-        //
-        // for (let i = 0;i < studentIds.length;i++) {
-        //     let childObject = await Student.findById(studentIds[i]);
-        //     students.push(childObject);
+        //! Fetching Data in sequence (N+1) issue
+        // let students = []
+        // for (let index = 0; index < studentNames.length; index++) {
+        //     const name = studentNames[index];
+        //     const student = await Student.findOne({fullName: name});
+        //     students.push(student);
         // }
 
-        // ✅✅ Use Promise.all() for parallel fetching:
-        // const students = await Promise.all(
-        //     studentIds.map(id => Student.findById(id))
-        // );
+        //! Calling Database in parallel using Promise.all()
+        const students = await Promise.all
+        (
+            studentNames.map(name => Student.findOne({fullName: name}))
+        )
 
-        // ✅✅ Filtering out null students (in case some IDs don't exist):
-        const students = (await Promise.all(
-            studentIds.map(id => Student.findById(id))
-        )).filter(s => s !== null);
-
-
-        let sequenceValue = await findSequence("Class Counter");
+        let sequenceValue = await findSequence("Class");
 
         const newClass = new Class({
-            _id:sequenceValue,
+            _id: sequenceValue,
             name,
-            // supervisor,
-            supervisor: supervisor._id,
-            // studentIds : students
-            studentIds: students.map(student => student._id)
+            supervisorId: supervisor._id,
+            studentIds: students.map(st => st._id)
         })
 
         const data = await newClass.save();
 
-        response.status(201).json({ newClass: data });
+        res.status(201).json({data})
     } catch (error) {
         console.log(error);
         next(error)
