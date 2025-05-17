@@ -2,6 +2,7 @@
 const express = require('express');
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+const cookieParser = require('cookie-parser');
 
 const seedBooks = require("./seedings/seedBooks");
 const seedRoles = require("./seedings/seedRoles");
@@ -32,6 +33,9 @@ app.use(morgan(":method :url :response-time"));
 
 //! Parse Request Body
 app.use(express.json());
+
+//! Parse Request Cookies
+app.use(cookieParser());
 
 //! Configure (.env)
 require("dotenv").config();

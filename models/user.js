@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Role"
         }
-    ]
+    ],
+    refreshToken: { type: String }
 });
 
 // Hash the password before saving it to the database

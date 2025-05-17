@@ -15,7 +15,7 @@ const protect = async (req, res, next) => {
         return res.status(401).json({ message: 'No token, Authentication denied' });
     }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.Access_Token_SECRET);
 
         const user = await User.findById(decoded.userId).populate("roles");
 

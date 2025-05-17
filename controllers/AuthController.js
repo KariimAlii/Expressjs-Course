@@ -31,7 +31,7 @@ const registerUser = async (req, res) => {
     // process.env.JWT_SECRET stores the secret key for signing the JWT, which should be defined in the .env file.
     const token = jwt.sign(
         { userId: user._id, email: user.email },
-        process.env.JWT_SECRET,
+        process.env.Access_Token_SECRET,
         { expiresIn: '1h' }
     );
 
@@ -58,16 +58,76 @@ const loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
         { userId: user._id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: '1h' }
+        process.env.Access_Token_SECRET,
+        { expiresIn: '15m' }
     );
 
-    res.json({
-        message: 'Login successful',
-        token,
-    });
+    const refreshToken = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.Refresh_Token_SECRET,
+        { expiresIn: '7d' }
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res
+        .cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: true,     // for testing using https
+            secure: false,     // for local testing using http
+            sameSite: 'strict', // or Lax
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        })
+        .json({
+            message: 'Login successful',
+            accessToken,
+        });
 };
 
-module.exports = { registerUser, loginUser };
+const refreshToken = async (req, res) => {
+    const token = req.cookies.refreshToken;
+
+    if (!token)
+        return res.status(401).json({ message: 'No refresh token' });
+
+    const decoded = jwt.verify(token, process.env.Refresh_Token_SECRET);
+
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.refreshToken !== token) {
+        return res.status(403).json({ message: 'Invalid refresh token' });
+    }
+
+    // Generate JWT
+    const accessToken = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.Access_Token_SECRET,
+        { expiresIn: '15m' }
+    );
+
+    const refreshToken = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.Refresh_Token_SECRET,
+        { expiresIn: '7d' }
+    );
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res
+        .cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            // secure: true,     // for testing using https
+            secure: false,     // for local testing using http
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        })
+        .json({
+            message: 'Login successful',
+            accessToken,
+        });
+}
+module.exports = { registerUser, loginUser, refreshToken };
