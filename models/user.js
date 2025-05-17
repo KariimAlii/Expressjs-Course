@@ -14,6 +14,12 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Password is required'],
         minlength: [6, 'Password must be at least 6 characters'],
     },
+    roles: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Role"
+        }
+    ]
 });
 
 // Hash the password before saving it to the database
@@ -33,11 +39,17 @@ userSchema.pre('save', async function (next) {
     }
 });
 
+
+
 // Method to compare the entered password with the hashed password in the database
 // matchPassword(): This method compares the entered password with the hashed password stored in the database.
 userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
+
+if (mongoose.models.User) {
+    delete mongoose.models.User;
+}
 
 const User = mongoose.model('User', userSchema);
 

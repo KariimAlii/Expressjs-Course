@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 
 const seedBooks = require("./seedings/seedBooks");
+const seedRoles = require("./seedings/seedRoles");
 
 const swaggerJsdoc = require('swagger-jsdoc');
 const openApiDocument = require('./swagger/openapi');
@@ -21,6 +22,7 @@ const studentRouter = require('./routers/studentRouter')
 const teacherRouter = require('./routers/teacherRouter')
 const bookRouter = require('./routers/bookRouter')
 const authRouter = require('./routers/authRouter')
+const userRouter = require('./routers/userRouter')
 
 //! Initialize an Express app
 const app = express();
@@ -62,6 +64,8 @@ app.use(classRouter);
 
 app.use('/api/auth', authRouter);
 
+app.use('/api/users', userRouter);
+
 //! Not Found Middleware
 app.use((req, res, next) => {
     res.status(404).json({ message: "Not Found" });
@@ -91,6 +95,7 @@ mongoose
     .then(async () => {
       console.log("DB Connected ..");
       await seedBooks();
+      await seedRoles();
       app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
         console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);

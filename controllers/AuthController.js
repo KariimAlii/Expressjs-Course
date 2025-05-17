@@ -1,4 +1,5 @@
 ﻿const User = require('../models/user');
+const Role = require('../models/role');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
@@ -14,8 +15,14 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ message: 'User already exists' });
     }
 
+    const userRole = await Role.findOne({ name: "User" });
+
     // Create a new user
-    const user = new User({ email, password });
+    const user = new User({
+            email,
+            password,
+            roles: [userRole._id]
+    });
     await user.save();
 
     // Generate JWT

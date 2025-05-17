@@ -4,7 +4,7 @@ const controller = require("../controllers/BooksController");
 const booksController = require("../controllers/BooksController");
 const {createBookValidation, validate, validateCreateBook: validateCreateBookByExpressValidation} = require("../express-validator-schemas/book.schema");
 const { validateCreateBook: validateCreateBookByJoi } = require('../schemas/book.schema');
-const protect = require("../middlewares/authMiddleware");
+const {protect} = require("../middlewares/authMiddleware");
 
 router
     .route("/api/books")
