@@ -26,4 +26,4 @@ const seedRoles = async () => {
     }
 };
 
-module.exports = initRoles;
+module.exports = seedRoles;
