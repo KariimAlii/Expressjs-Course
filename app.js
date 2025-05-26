@@ -53,7 +53,8 @@ app.get('/', (req, res) => {
 
 app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
-    rootValue: graphqlResolver
+    rootValue: graphqlResolver,
+    graphiql: true
 }))
 //! Not Found Middleware
 app.use((req, res, next) => {

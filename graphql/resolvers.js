@@ -1,9 +1,73 @@
-﻿module.exports = {
+﻿const User = require('../models/User');
+const Role = require("../models/role");
+
+module.exports = {
     hello() {
         // return 'Hello World!';
         return {
             text: 'Hello World!',
             views: 1245
         };
+    },
+    // createUser(args, request) {
+    //     const userInput = args.userInput;
+    // }
+
+    // createUser({ userInput }, request) {
+    // }
+
+    createUser: async function({ userInput }, request) {
+        const existingUser = await User.findOne({email: userInput.email});
+
+        if (existingUser) {
+            throw new Error('User not found');
+        }
+
+        const userRole = await Role.findOne({ name: "User" });
+
+        const user = new User({
+            email: userInput.email,
+            password: userInput.password,
+            roles: [userRole._id]
+        });
+
+        const createdUser = await user.save();
+
+        return {...createdUser._doc, _id: createdUser._id.toString()};
     }
 }
+
+// Using Postman
+//=======================
+// {
+//     "query": "{ hello { text views } }"
+// }
+// {
+//     "query": "mutation { createUser(userInput: { email: \"A@gmail.com\", password: \"A12345\" }) { _id email } }"
+// }
+// or using variables
+// {
+//     "query": "mutation CreateUser($email: String!, $password: String!) { createUser(userInput: { email: $email, password: $password }) { _id email } }",
+//     "variables": {
+//          "email": "K@gmail.com",
+//          "password": "K12345"
+//      }
+// }
+
+// Using Graphiql
+//======================
+// query {
+//     hello {
+//          text
+//          views
+//     }
+// }
+// mutation {
+//     createUser(userInput:{
+//         email:"K@gmail.com",
+//             password: "K12345"
+//     }) {
+//         _id
+//         email
+//     }
+// }
