@@ -11,19 +11,17 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const openApiDocument = require('./swagger/openapi');
 const swaggerUi = require('swagger-ui-express');
 
+const { graphqlHTTP } = require('express-graphql');
+const graphqlSchema = require('./graphql/schema');
+const graphqlResolver = require('./graphql/resolvers');
+
 const path = require('path');
 
 //! Import Controllers
 const booksController = require('./controllers/BooksController');
 
 
-//! Import Routers
-const classRouter = require('./routers/classRouter')
-const studentRouter = require('./routers/studentRouter')
-const teacherRouter = require('./routers/teacherRouter')
-const bookRouter = require('./routers/bookRouter')
-const authRouter = require('./routers/authRouter')
-const userRouter = require('./routers/userRouter')
+
 
 //! Initialize an Express app
 const app = express();
@@ -53,23 +51,10 @@ app.get('/', (req, res) => {
   res.send('Welcome to Express API!');
 });
 
-
-
-
-//! Routers
-
-app.use(bookRouter);
-
-app.use(teacherRouter);
-
-app.use(studentRouter);
-
-app.use(classRouter);
-
-app.use('/api/auth', authRouter);
-
-app.use('/api/users', userRouter);
-
+app.use('/graphql', graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver
+}))
 //! Not Found Middleware
 app.use((req, res, next) => {
     res.status(404).json({ message: "Not Found" });
