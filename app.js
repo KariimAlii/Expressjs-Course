@@ -54,7 +54,18 @@ app.get('/', (req, res) => {
 app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
-    graphiql: true
+    graphiql: true,
+    formatError(err) {
+        // return err;
+        if(!err.originalError) {
+            return err;
+        } else {
+            const data = err.originalError.data;
+            const code = err.originalError.code || 500;
+            const message = err.message || 'An Error occured...';
+            return {message, status: code , data};
+        }
+    }
 }))
 //! Not Found Middleware
 app.use((req, res, next) => {

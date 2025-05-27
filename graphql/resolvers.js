@@ -2,6 +2,7 @@
 const Role = require("../models/role");
 const Book = require("../models/book");
 const {bookSchema} = require('../schemas/book.schema')
+const {custom} = require("joi");
 module.exports = {
     hello() {
         // return 'Hello World!';
@@ -38,8 +39,13 @@ module.exports = {
     },
     createBook: async({ bookInput }) => {
         const { error, value } = bookSchema.validate(bookInput, { abortEarly: false });
-        if (error)
-            throw new Error(error);
+        if (error) {
+            const customError = new Error("Error validating book schema");
+            customError.data = error;
+            customError.code = 400;
+            throw customError;
+        }
+
         const {title, author, publishedYear, isbn} = bookInput;
         const newBook = new Book({ title, author, publishedYear, isbn });
         await newBook.save();
