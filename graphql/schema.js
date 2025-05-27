@@ -28,8 +28,21 @@ module.exports = buildSchema(`
         email: String!
         password: String!
     }
+    input CreateBookDto {
+        title: String!
+        author: String!
+        publishedYear: String!
+        isbn: String!
+    }
+    type Book {
+        title: String!
+        author: String!
+        publishedYear: String!
+        isbn: String!
+    }
     type RootMutation {
         createUser(userInput: CreateUserDto): User!
+        createBook(bookInput: CreateBookDto): Book!
     }
     schema {
         query: RootQuery

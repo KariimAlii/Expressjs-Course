@@ -1,5 +1,6 @@
 ﻿const User = require('../models/User');
 const Role = require("../models/role");
+const Book = require("../models/book");
 
 module.exports = {
     hello() {
@@ -34,6 +35,12 @@ module.exports = {
         const createdUser = await user.save();
 
         return {...createdUser._doc, _id: createdUser._id.toString()};
+    },
+    createBook: async({ bookInput }) => {
+        const {title, author, publishedYear, isbn} = bookInput;
+        const newBook = new Book({ title, author, publishedYear, isbn });
+        await newBook.save();
+        return newBook;
     }
 }
 
@@ -69,5 +76,21 @@ module.exports = {
 //     }) {
 //         _id
 //         email
+//     }
+// }
+
+// mutation {
+//     createBook (
+//         bookInput:
+//     {
+//         title: "My Book",
+//             author:"Karim",
+//         publishedYear :"2010",
+//         isbn: "978-1234567890"
+//     }) {
+//         title
+//         author
+//         publishedYear
+//         isbn
 //     }
 // }
