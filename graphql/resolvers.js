@@ -41,6 +41,14 @@ module.exports = {
         const newBook = new Book({ title, author, publishedYear, isbn });
         await newBook.save();
         return newBook;
+    },
+    findBookWithFilters: async ({ filter }) => {
+        const query = {};
+        if (filter?.minYear) query.publishedYear = { ...query.publishedYear, $gte: filter.minYear };
+        if (filter?.maxYear) query.publishedYear = { ...query.publishedYear, $lte: filter.maxYear };
+        if (filter?.title) query.title = { $regex: filter.title, $options: 'i' };
+
+        return await Book.find(query);
     }
 }
 
@@ -93,4 +101,10 @@ module.exports = {
 //         publishedYear
 //         isbn
 //     }
+// }
+
+
+
+// query {
+//     findBookWithFilters(filter:{minYear: 2000}) {title author publishedYear}
 // }

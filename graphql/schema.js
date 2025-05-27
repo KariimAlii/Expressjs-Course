@@ -6,8 +6,14 @@ module.exports = buildSchema(`
         text: String!
         views: Int
     }
+    input ProductFilterInput {
+      minYear: Int
+      maxYear: Int
+      title: String
+    }
     type RootQuery {
         hello: TestData!
+        findBookWithFilters(filter: ProductFilterInput): [Book]
     }
     type Post {
         _id: ID!
@@ -49,3 +55,6 @@ module.exports = buildSchema(`
         mutation: RootMutation
     }
 `);
+
+// SDL stands for Schema Definition Language,
+// and it is a standard, framework-independent way to define a GraphQL schema.
