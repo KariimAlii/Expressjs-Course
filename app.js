@@ -51,10 +51,15 @@ app.use('/swagger.json', express.static(path.join(__dirname, 'swagger.json')));
 app.get('/', (req, res) => {
   res.send('Welcome to Express API!');
 });
-app.use((req,res) => {
-    if(req.method === 'OPTIONS')
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
-})
+    }
+    next();
+});
 app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
