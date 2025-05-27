@@ -12,16 +12,10 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const openApiDocument = require('./swagger/openapi');
 const swaggerUi = require('swagger-ui-express');
 
-const { graphqlHTTP } = require('express-graphql');
-const graphqlSchema = require('./graphql/schema');
-const graphqlResolver = require('./graphql/resolvers');
+const { createHandler } = require('graphql-http/lib/use/express');
+const { schema } = require('./graphql/schema');
 
 const path = require('path');
-
-//! Import Controllers
-const booksController = require('./controllers/BooksController');
-
-
 
 
 //! Initialize an Express app
@@ -51,26 +45,31 @@ app.use('/swagger.json', express.static(path.join(__dirname, 'swagger.json')));
 app.get('/', (req, res) => {
   res.send('Welcome to Express API!');
 });
-app.use((req,res) => {
-    if(req.method === 'OPTIONS')
-        return res.sendStatus(200);
-})
-app.use('/graphql', graphqlHTTP({
-    schema: graphqlSchema,
-    rootValue: graphqlResolver,
-    graphiql: true,
-    formatError(err) {
+
+
+// Custom error formatter
+const formatError = (err) => {
+    if (!err.originalError) {
         return err;
-        // if(!err.originalError) {
-        //     return err;
-        // } else {
-        //     const data = err.originalError.data;
-        //     const code = err.originalError.code || 500;
-        //     const message = err.message || 'An Error occured...';
-        //     return {message, status: code , data};
-        // }
     }
-}))
+    const data = err.originalError.data;
+    const code = err.originalError.code || 500;
+    const message = err.message || 'An Error occurred...';
+    return { message, status: code, data };
+};
+
+// GraphQL endpoint
+app.all('/graphql', createHandler({
+    schema,
+    context: (req) => ({ req }),
+    formatError, // Add your custom error formatter here
+}));
+
+// use ruru graphiql
+//=========================
+// npm install -g ruru@beta
+// npx ruru -SP -p 4001 -e http://localhost:3000/graphql
+
 //! Not Found Middleware
 app.use((req, res, next) => {
     res.status(404).json({ message: "Not Found" });
