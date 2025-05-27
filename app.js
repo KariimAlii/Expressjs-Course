@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const seedBooks = require("./seedings/seedBooks");
 const seedRoles = require("./seedings/seedRoles");
@@ -25,7 +26,7 @@ const booksController = require('./controllers/BooksController');
 
 //! Initialize an Express app
 const app = express();
-
+app.use(cors());
 //! Logging Middleware
 app.use(morgan(":method :url :response-time"));
 
@@ -50,21 +51,24 @@ app.use('/swagger.json', express.static(path.join(__dirname, 'swagger.json')));
 app.get('/', (req, res) => {
   res.send('Welcome to Express API!');
 });
-
+app.use((req,res) => {
+    if(req.method === 'OPTIONS')
+        return res.sendStatus(200);
+})
 app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
     graphiql: true,
     formatError(err) {
-        // return err;
-        if(!err.originalError) {
-            return err;
-        } else {
-            const data = err.originalError.data;
-            const code = err.originalError.code || 500;
-            const message = err.message || 'An Error occured...';
-            return {message, status: code , data};
-        }
+        return err;
+        // if(!err.originalError) {
+        //     return err;
+        // } else {
+        //     const data = err.originalError.data;
+        //     const code = err.originalError.code || 500;
+        //     const message = err.message || 'An Error occured...';
+        //     return {message, status: code , data};
+        // }
     }
 }))
 //! Not Found Middleware

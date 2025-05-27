@@ -37,7 +37,7 @@ module.exports = buildSchema(`
     input CreateBookDto {
         title: String!
         author: String!
-        publishedYear: String!
+        publishedYear: Int!
         isbn: String!
     }
     type Book {
