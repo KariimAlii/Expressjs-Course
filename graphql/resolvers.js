@@ -1,7 +1,7 @@
 ﻿const User = require('../models/User');
 const Role = require("../models/role");
 const Book = require("../models/book");
-
+const {bookSchema} = require('../schemas/book.schema')
 module.exports = {
     hello() {
         // return 'Hello World!';
@@ -37,6 +37,9 @@ module.exports = {
         return {...createdUser._doc, _id: createdUser._id.toString()};
     },
     createBook: async({ bookInput }) => {
+        const { error, value } = bookSchema.validate(bookInput, { abortEarly: false });
+        if (error)
+            throw new Error(error);
         const {title, author, publishedYear, isbn} = bookInput;
         const newBook = new Book({ title, author, publishedYear, isbn });
         await newBook.save();
