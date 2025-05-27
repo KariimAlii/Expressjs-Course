@@ -1,10 +1,15 @@
 const API = 'http://localhost:3000/graphql'
 async function createBook() {
-        const query = {
-            query: `
-                mutation { createUser(userInput: { email: "A@gmail.com", password: "A12345" }) { _id email } }
+    const query = {
+        query: `
+                mutation {
+                    createUser(userInput: { email: "A@gmail.com", password: "A12345" }) {
+                        _id
+                        email
+                    }
+                }
             `
-        }
+    };
 
 
       const res = await fetch(API, {
