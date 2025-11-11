@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 const seedBooks = require("./seedings/seedBooks");
 const seedRoles = require("./seedings/seedRoles");
@@ -27,6 +28,9 @@ const userRouter = require('./routers/userRouter')
 
 //! Initialize an Express app
 const app = express();
+
+//! Enable CORS
+app.use(cors());
 
 //! Logging Middleware
 app.use(morgan(":method :url :response-time"));
