@@ -25,6 +25,12 @@ const registerUser = async (req, res) => {
     });
     await user.save();
 
+    // Token expiration in seconds
+    const expiresIn = 60 * 60; // 1 hour
+
+    // Generate expiration date
+    const expirationDate = new Date(Date.now() + expiresIn * 1000).toISOString();
+
     // Generate JWT
     // jsonwebtoken: A library for signing and verifying JWTs.
     // JWT Signing: After successfully creating the user, we sign a JWT using the jsonwebtoken library and return it in the response.
@@ -32,12 +38,13 @@ const registerUser = async (req, res) => {
     const token = jwt.sign(
         { userId: user._id, email: user.email },
         process.env.Access_Token_SECRET,
-        { expiresIn: '1h' }
+        { expiresIn }  //! same as expiresIn: '1h'
     );
 
     res.status(201).json({
         message: 'User registered successfully',
         token,
+        expiration: expirationDate,
     });
 };
 
@@ -45,7 +52,8 @@ const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     // Check if the user exists
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate("roles");
+
     if (!user) {
         return res.status(400).json({ message: 'Invalid email or password' });
     }
@@ -57,15 +65,29 @@ const loginUser = async (req, res) => {
         return res.status(400).json({ message: 'Invalid email or password' });
     }
 
+    // Token expiration in seconds
+    const expiresIn = 60 * 60; // 1 hour
+
+    // Generate expiration date
+    const expirationDate = new Date(Date.now() + expiresIn * 1000).toISOString();
+
     // Generate JWT
     const accessToken = jwt.sign(
-        { userId: user._id, email: user.email },
+        {
+            userId: user._id,
+            email: user.email,
+            roles: user.roles.map(role => role.name)
+        },
         process.env.Access_Token_SECRET,
-        { expiresIn: '15m' }
+        { expiresIn }  //! same as expiresIn: '1h'
     );
 
     const refreshToken = jwt.sign(
-        { userId: user._id, email: user.email },
+        {
+            userId: user._id,
+            email: user.email,
+            roles: user.roles.map(role => role.name)
+        },
         process.env.Refresh_Token_SECRET,
         { expiresIn: '7d' }
     );
@@ -84,6 +106,7 @@ const loginUser = async (req, res) => {
         .json({
             message: 'Login successful',
             accessToken,
+            expiration: expirationDate,
         });
 };
 
@@ -95,7 +118,7 @@ const refreshToken = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.Refresh_Token_SECRET);
 
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId).populate("roles");
 
     if (!user || user.refreshToken !== token) {
         return res.status(403).json({ message: 'Invalid refresh token' });
@@ -103,13 +126,21 @@ const refreshToken = async (req, res) => {
 
     // Generate JWT
     const accessToken = jwt.sign(
-        { userId: user._id, email: user.email },
+        {
+            userId: user._id,
+            email: user.email,
+            roles: user.roles.map(role => role.name)
+        },
         process.env.Access_Token_SECRET,
         { expiresIn: '15m' }
     );
 
     const refreshToken = jwt.sign(
-        { userId: user._id, email: user.email },
+        {
+            userId: user._id,
+            email: user.email,
+            roles: user.roles.map(role => role.name)
+        },
         process.env.Refresh_Token_SECRET,
         { expiresIn: '7d' }
     );

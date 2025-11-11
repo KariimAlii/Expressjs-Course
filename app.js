@@ -95,10 +95,10 @@ app.use((error, req, res, next) => {
 
 //! Start the server
 mongoose
-    .connect("mongodb://127.0.0.1:27017/EcommerceSystem")
+    .connect("mongodb://127.0.0.1:27017/EcommerceSystem_DEPI_Round3")
     .then(async () => {
       console.log("DB Connected ..");
-      await seedBooks();
+      // await seedBooks();
       await seedRoles();
       app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
